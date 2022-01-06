@@ -14,12 +14,23 @@ const getRecords = async (bodyData) => {
     endDate,
     minCount,
     maxCount,
-    page = 1,
-    count = 20,
+    page = null,
+    count = null,
   } = bodyData;
 
-  const skip = (+page ? +page - 1 : +page) * +count;
-  const limit = +count;
+  let paginationPipeline = [];
+  if (page && count) {
+    const skip = (+page ? +page - 1 : +page) * +count;
+    const limit = +count;
+    paginationPipeline.push(
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      }
+    );
+  }
 
   if (!startDate || !endDate || !minCount || !maxCount)
     throw new Error(`Input data is missing`);
@@ -59,12 +70,7 @@ const getRecords = async (bodyData) => {
       {
         $sort: { totalCount: 1 },
       },
-      {
-        $skip: skip,
-      },
-      {
-        $limit: limit,
-      },
+      ...paginationPipeline
     ])
     .catch((err) => {
       throw new Error(`Error fetching Records`);

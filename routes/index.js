@@ -9,6 +9,7 @@ router.post("/", function (req, res, next) {
       res.status(200).send(data);
     })
     .catch((err) => {
+      console.error({ err }, "Error on post method");
       res.status(400).send(err.message);
     });
 });
